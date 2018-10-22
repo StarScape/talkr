@@ -1,25 +1,39 @@
 window.onload = function() {
 
-var vm = new Vue({
+window.vm = new Vue({
   el: "#app",
   data: {
     currentChat: "",
     chats: [],
-    id: null
+    userName: ""
   },
 
   mounted: function() {
+    var name = prompt("Enter username:");
     this.ws = new WebSocket("ws://127.0.0.1:8080");
     
-    // Shake hands    
-    this.ws.onmessage = (message) => {
-      var data = JSON.parse(message.data);
-      this.id = data.id;
-      this.chats = data.chats;
+    this.ws.onopen = (e) => {
+      // Ask server to use username
+      this.ws.send(name);
+      
+      // See if they let us
+      this.ws.onmessage = (message) => {
+        var data = JSON.parse(message.data);
 
-      // Handshake complete, handle messages normally
-      this.ws.onmessage = this.handleMessage;
-    }
+        if (data.nameGranted) {
+          console.log("Username granted.");
+          this.userName = name;
+          this.chats = data.chats;
+
+          // Handle messages normally from now on
+          this.ws.onmessage = this.handleMessage;
+        }
+        else {
+          name = prompt("Username taken, enter new username:");
+          this.ws.send(name);
+        }
+      }
+    };
   },
 
   methods: {

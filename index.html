@@ -15,11 +15,11 @@
 <body>
 
   <div id='app'>
-    <h1>ID: {{ id }}</h1>
+    <h1>User: {{ userName }}</h1>
 
     <ul>
       <li v-for='chat in chats'>
-        {{ chat.id }}: {{ chat.text }}
+        {{ chat.userName }}: {{ chat.text }}
       </li>
     </ul>
 
