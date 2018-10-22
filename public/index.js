@@ -5,45 +5,52 @@ window.vm = new Vue({
   data: {
     currentChat: "",
     chats: [],
-    userName: ""
+    pendingUserName: "",
+    userName: "",
+    checkingUsername: true,
+    usernamePrompt: "Please enter username"
   },
 
   mounted: function() {
-    var name = "";
+    // var name = "";
     this.ws = new WebSocket("ws://127.0.0.1:8080");
     
     this.ws.onopen = (e) => {
       this.ws.onmessage = (message) => {
         this.chats = JSON.parse(message.data).chats;
-        name = prompt("Enter username:");
-
-        // Ask server for username
-        this.ws.send(name);
-        this.ws.onmessage = nameRequestHandler;
       }
     };
+  },
 
-    // See if server gives us username
-    var nameRequestHandler = (message) => {
-      console.log(message);
+  methods: {
+    // Get the name inputted from our modal window
+    receiveName: function(name) {
+      this.pendingUserName = name;
+      this.ws.send(name);
+      this.ws.onmessage = this.nameRequestHandler;
+    },
+
+    nameRequestHandler: function (message) {
       var data = JSON.parse(message.data);
 
       if (data.nameGranted) {
         console.log("Username granted.");
-        this.userName = name;
-        this.chats = data.chats;
+        this.userName = this.pendingUserName;
 
         // Handle messages normally from now on
         this.ws.onmessage = this.handleMessage;
+        this.checkingUsername = false;
       }
       else {
-        name = prompt("Username taken, enter new username:");
-        this.ws.send(name);
+        this.usernamePrompt = `'${this.pendingUserName}' is taken, try again.`
       }
-    }
-  },
+    },
 
-  methods: {
+    handleMessage: function(message) {
+      var data = JSON.parse(message.data);
+      this.chats.push(data);
+    },
+
     sendChat: function(e) {
       this.ws.send(JSON.stringify({
         date: Date.now(),
@@ -51,16 +58,10 @@ window.vm = new Vue({
       }));
     },
 
-    handleMessage: function(message) {
-      var data = JSON.parse(message.data);
-      console.log(data);
-      this.chats.push(data);
-    },
-
     displayDate: function(date) {
       var d = new Date(date);
       return `${d.getHours()}:${d.getMinutes()}`
-    }
+    },
   }
 });
 

@@ -1,0 +1,45 @@
+ul {
+  /*list-style-type: none;*/
+}
+
+.modal-wrapper {
+  z-index: 998;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.modal {
+  z-index: 999;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 200px;
+  height: 150px;
+  transform: translate(-50%, -50%);
+  border: 1px solid grey;
+  border-radius: 3px;
+  background-color: white;
+  padding: 10px;
+  text-align: center;
+}
+
+.modal input {
+  margin-top: 5px;
+}
+
+.chat {
+  color: black;
+}
+
+.user-chat {
+  color: red;
+}
+
+#chat-input {
+  border-radius: 12px;
+  resize: none;
+}
