@@ -18,7 +18,7 @@
     <h1>User: {{ userName }}</h1>
 
     <ul>
-      <li v-for='chat in chats'>
+      <li v-for='chat in chats' v-bind:title='displayDate(chat.date)'>
         {{ chat.userName }}: {{ chat.text }}
       </li>
     </ul>

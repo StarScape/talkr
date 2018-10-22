@@ -16,7 +16,7 @@ window.vm = new Vue({
       this.ws.onmessage = (message) => {
         this.chats = JSON.parse(message.data).chats;
         name = prompt("Enter username:");
-        
+
         // Ask server for username
         this.ws.send(name);
         this.ws.onmessage = nameRequestHandler;
@@ -45,13 +45,21 @@ window.vm = new Vue({
 
   methods: {
     sendChat: function(e) {
-      this.ws.send(this.currentChat);
+      this.ws.send(JSON.stringify({
+        date: Date.now(),
+        text: this.currentChat
+      }));
     },
 
     handleMessage: function(message) {
       var data = JSON.parse(message.data);
       console.log(data);
       this.chats.push(data);
+    },
+
+    displayDate: function(date) {
+      var d = new Date(date);
+      return `${d.getHours()}:${d.getMinutes()}`
     }
   }
 });

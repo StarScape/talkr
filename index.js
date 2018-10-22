@@ -44,11 +44,13 @@ wss.on('connection', ws => {
   }
 
   function normalHandler(message) {
-    var data = { userName: ws.userName, text: message };
-    chats.push(data);
+    var chat = JSON.parse(message);
+    // var chat = { userName: ws.userName, text: data.text, date: data.date };
+    chat['userName'] = ws.userName;
+    chats.push(chat);
 
     // Broadcast the chat to all users
-    wss.broadcast(JSON.stringify(data));
+    wss.broadcastChat(chat);
   }
 
   ws.on('message', function (message) {
@@ -68,8 +70,8 @@ wss.on('connection', ws => {
   }));
 });
 
-wss.broadcast = function(message) {
+wss.broadcastChat = function(chat) {
   wss.clients.forEach(function(client) {
-    client.send(message);
+    client.send(JSON.stringify(chat));
   })
 };
