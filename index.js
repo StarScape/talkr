@@ -63,10 +63,9 @@ wss.on('connection', ws => {
   // Send initial data
   // var id = Math.floor(Math.random() * 100);
   // ws.userID = id;
-  // ws.send(JSON.stringify({
-  //   id: id,
-  //   chats: chats
-  // }));
+  ws.send(JSON.stringify({
+    chats: chats
+  }));
 });
 
 wss.broadcast = function(message) {
