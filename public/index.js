@@ -24,14 +24,12 @@ var vm = new Vue({
 
   methods: {
     sendChat: function(e) {
-      this.ws.send(JSON.stringify({
-        id: this.id,
-        text: this.currentChat
-      }));
+      this.ws.send(this.currentChat);
     },
 
     handleMessage: function(message) {
       var data = JSON.parse(message.data);
+      console.log(data);
       this.chats.push(data);
     }
   }

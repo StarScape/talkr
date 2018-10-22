@@ -22,16 +22,18 @@ var chats = [
 
 wss.on('connection', ws => {
   ws.on('message', function (message) {
-    var data = JSON.parse(message);
+    var data = { id: ws.userID, text: message };
     chats.push(data);
 
     // Broadcast the chat to all users
-    wss.broadcast(message);
+    wss.broadcast(JSON.stringify(data));
   });
   
   // Send initial data
+  var id = Math.floor(Math.random() * 100);
+  ws.userID = id;
   ws.send(JSON.stringify({
-    id: Math.floor(Math.random() * 100),
+    id: id,
     chats: chats
   }));
 });
