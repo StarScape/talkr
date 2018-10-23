@@ -5,6 +5,7 @@ window.vm = new Vue({
   data: {
     currentChat: "",
     chats: [],
+    users: ["Jack", "James", "John"],
     pendingUserName: "",
     userName: "",
     checkingUsername: true,
@@ -39,7 +40,7 @@ window.vm = new Vue({
         this.userName = this.pendingUserName;
 
         // Handle messages normally from now on
-        this.ws.onmessage = this.handleMessage;
+        this.ws.onmessage = this.masterHandler;
         this.checkingUsername = false;
       }
       else {
@@ -49,8 +50,27 @@ window.vm = new Vue({
 
     handleMessage: function(message) {
       var data = JSON.parse(message.data);
+      // console.log('Message received');
       this.chats.push(data);
       this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
+    },
+
+    handleUsersList: function(message) {
+      var data = JSON.parse(message.data);
+      this.users = data.users;
+    },
+
+    masterHandler: function(message) {
+      var type = JSON.parse(message.data).type;
+      
+      switch (type) {
+        case "chat":
+          this.handleMessage(message);
+          break;
+        case "usersList":
+          this.handleUsersList(message);
+          break;
+      }
     },
 
     sendChat: function(e) {

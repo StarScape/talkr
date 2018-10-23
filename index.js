@@ -15,7 +15,7 @@ console.log("Listening on port 80...");
 
 // Websockets server
 var wss = new WebSocket.Server({ port: 8080 });
-var takenNames = ["Admin"];
+var users = ["admin"];
 var chats = [
   {userName: "admin", text: "Welcome to chat!"},
 ];
@@ -23,9 +23,10 @@ var chats = [
 wss.on('connection', ws => {
   var handshakeOver = false;
 
+
   // Is desired username taken?
   function initialHandler(message) {
-    if (takenNames.includes(message)) {
+    if (users.includes(message)) {
       ws.send(JSON.stringify({
         nameGranted: false
       }));
@@ -36,18 +37,32 @@ wss.on('connection', ws => {
         chats: chats
       }));
       ws.userName = message;
-      takenNames.push(message);
+      users.push(message);
       handshakeOver = true;
 
+      // Send out list of active users periodically
+      broadcastUserList();
       console.log(`User connected: ${ws.userName}`);
+    }
+  }
+
+  function broadcastUserList() {
+    if (ws.readyState == 1) {
+      ws.send(JSON.stringify({
+        type: "usersList",
+        users: users.filter((name) => name != "admin")
+      }));
+
+      // Broadcast updated user list periodically
+      setTimeout(broadcastUserList, 10000);
     }
   }
 
   function normalHandler(message) {
     var chat = JSON.parse(message);
-    // var chat = { userName: ws.userName, text: data.text, date: data.date };
     chat['userName'] = ws.userName;
     chats.push(chat);
+    chat['type'] = 'chat';
 
     // Broadcast the chat to all users
     wss.broadcastChat(chat);
@@ -63,8 +78,6 @@ wss.on('connection', ws => {
   });
   
   // Send initial data
-  // var id = Math.floor(Math.random() * 100);
-  // ws.userID = id;
   ws.send(JSON.stringify({
     chats: chats
   }));
@@ -73,5 +86,5 @@ wss.on('connection', ws => {
 wss.broadcastChat = function(chat) {
   wss.clients.forEach(function(client) {
     client.send(JSON.stringify(chat));
-  })
+  });
 };

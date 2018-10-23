@@ -81,14 +81,32 @@ ul {
   padding-bottom: 10px;
   box-shadow: -10px 0 50px #9d00ff;
   background: linear-gradient(180deg, #9d00ff 50%,#ee66f2 100%);
-}
-
-#sidebar h4 {
   text-transform: uppercase;
 }
 
 #users-list {
+  width: 50%;
+  margin: 0 auto;
   margin-top: 25px;
+  text-align: left;
+}
+
+#users-list li {
+  margin-bottom: 10px;
+}
+
+.status {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-right: 15px;
+  border-radius: 50%;
+  background: rgba(100, 255, 100);
+  box-shadow: 0 0 0 rgba(100, 255, 100, 0.4);
+  animation: pulse 2s infinite;
+}
+
+.username {
 }
 
 #content-container {
@@ -192,4 +210,31 @@ header {
   width: 30px;
   filter: invert(100%);
   transform: translate(1px, 0px) rotate(-45deg);
+}
+
+/* Borred and modified from https://codepen.io/olam/pen/zcqea */
+@-webkit-keyframes pulse {
+  0% {
+    -webkit-box-shadow: 0 0 0 0 rgba(100, 255, 100, 0.4);
+  }
+  70% {
+      -webkit-box-shadow: 0 0 0 10px rgba(100, 255, 100, 0);
+  }
+  100% {
+      -webkit-box-shadow: 0 0 0 0 rgba(100, 255, 100, 0);
+  }
+}
+@keyframes pulse {
+  0% {
+    -moz-box-shadow: 0 0 0 0 rgba(100, 255, 100, 0.4);
+    box-shadow: 0 0 0 0 rgba(100, 255, 100, 0.4);
+  }
+  70% {
+      -moz-box-shadow: 0 0 0 10px rgba(100, 255, 100, 0);
+      box-shadow: 0 0 0 10px rgba(100, 255, 100, 0);
+  }
+  100% {
+      -moz-box-shadow: 0 0 0 0 rgba(100, 255, 100, 0);
+      box-shadow: 0 0 0 0 rgba(100, 255, 100, 0);
+  }
 }
