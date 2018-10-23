@@ -6,8 +6,9 @@
   <script src='modal.js'></script>
   <script src='index.js'></script>
 
+  <!-- <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet"> -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway:300,400" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="style.css">
-
 
 </head>
 <body>
@@ -17,31 +18,52 @@
         <h4><slot></slot></h4>
         <input  type="text" 
                 name="modalInput"
+                placeholder='Who are you?'
+                class='modal-text'
                 v-on:keyup.enter='buttonClicked()'
                 v-model='input'>
         <br>
-        <input type="submit" name="submitModal" v-on:click='buttonClicked()'>
+        <input type="submit" name="submitModal" class='modal-button' v-on:click='buttonClicked()'>
       </div>
     </div>
   </template>
 
   <div id='app'>
-    <h1>User: {{ userName }}</h1>
+    <div id='sidebar'>
+      <h4>Users</h4>
 
-    <ul>
-      <li v-for='chat in chats'
-          v-bind:title='displayDate(chat.date)'
-          v-bind:class="{ chat: !(chat.userName == userName), 'user-chat': chat.userName == userName }">
-        {{ chat.userName }}: {{ chat.text }}
-      </li>
-    </ul>
+      <ul id='users-list'>
+        <li>infamousEcho</li>
+      </ul>
+    </div>
 
-    <textarea id='chat-input'
-              placeholder='Type a message...'
-              v-model='currentChat'></textarea>
-    <button id='send-chat' v-on:click='sendChat'>Send chat</button>
+    <div id='content-container'>
+    <header>
+      <h2>Chat</h2>
+      <h6>Logged in as: {{ userName }}</h6>
+    </header>
+      <div id='chat-container'> 
 
-    <modal  v-bind:on-submit='receiveName'
+        <ul id='chat-list'>
+          <div  v-for='chat in chats'
+                v-bind:class="{ 'chat-wrapper': !(chat.userName == userName), 'user-chat-wrapper': chat.userName == userName }">
+            <div class='chat' v-bind:title='displayDate(chat.date)'>
+              {{ chat.userName }}: {{ chat.text }}
+            </div>
+          </div>
+        </ul>
+      </div>
+
+      <div id='input-container'>
+        <textarea id='chat-input'
+                  placeholder='Type a message...'
+                  v-on:keyup.enter='sendChat'
+                  v-model='currentChat'></textarea>
+        <button id='send-chat' v-on:click='sendChat'><img src="img/send.png"></button>
+      </div>
+    </div>
+
+    <modal  v-if='true' v-bind:on-submit='receiveName'
             v-bind:show-condition='checkingUsername'>
           {{ usernamePrompt }}
     </modal>

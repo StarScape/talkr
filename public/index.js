@@ -8,16 +8,17 @@ window.vm = new Vue({
     pendingUserName: "",
     userName: "",
     checkingUsername: true,
-    usernamePrompt: "Please enter username"
+    usernamePrompt: "Enter username"
   },
 
   mounted: function() {
-    // var name = "";
+    this.chatContainer = this.$el.querySelector('#chat-container');
     this.ws = new WebSocket("ws://127.0.0.1:8080");
     
     this.ws.onopen = (e) => {
       this.ws.onmessage = (message) => {
         this.chats = JSON.parse(message.data).chats;
+        this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
       }
     };
   },
@@ -49,6 +50,7 @@ window.vm = new Vue({
     handleMessage: function(message) {
       var data = JSON.parse(message.data);
       this.chats.push(data);
+      this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
     },
 
     sendChat: function(e) {
@@ -56,11 +58,14 @@ window.vm = new Vue({
         date: Date.now(),
         text: this.currentChat
       }));
+
+      this.currentChat = "";
+      this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
     },
 
     displayDate: function(date) {
       var d = new Date(date);
-      return `${d.getHours()}:${d.getMinutes()}`
+      return d;
     },
   }
 });
