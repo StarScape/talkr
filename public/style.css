@@ -209,7 +209,7 @@ header {
 #input-container button img {
   width: 30px;
   filter: invert(100%);
-  transform: translate(1px, 0px) rotate(-45deg);
+  transform: translate(2px, 0px) rotate(-45deg);
 }
 
 /* Borred and modified from https://codepen.io/olam/pen/zcqea */
