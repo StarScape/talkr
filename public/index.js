@@ -17,24 +17,28 @@ window.vm = new Vue({
     this.ws = new WebSocket("ws://127.0.0.1:8080");
     
     this.ws.onopen = (e) => {
-      this.ws.onmessage = (message) => {
-        this.chats = JSON.parse(message.data).chats;
-        this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
-      }
+      this.ws.onmessage = this.masterHandler;
     };
   },
 
   methods: {
     // Get the name inputted from our modal window
-    receiveName: function(name) {
+    submitName: function(name) {
       this.pendingUserName = name;
-      this.ws.send(name);
-      this.ws.onmessage = this.nameRequestHandler;
+      this.ws.send(JSON.stringify({
+        type: "nameRequest",
+        name: name
+      }));
+      // this.ws.onmessage = this.nameRequestHandler;
     },
 
-    nameRequestHandler: function (message) {
-      var data = JSON.parse(message.data);
+    // The server sends down the existing chats first
+    initialDataHandler: function(data) {
+      this.chats = data.chats;
+      this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
+    },
 
+    nameRequestHandler: function (data) {
       if (data.nameGranted) {
         console.log("Username granted.");
         this.userName = this.pendingUserName;
@@ -48,27 +52,30 @@ window.vm = new Vue({
       }
     },
 
-    handleMessage: function(message) {
-      var data = JSON.parse(message.data);
-      // console.log('Message received');
+    messageHandler: function(data) {
       this.chats.push(data);
       this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
     },
 
-    handleUsersList: function(message) {
-      var data = JSON.parse(message.data);
+    usersListHandler: function(data) {
       this.users = data.users;
     },
 
     masterHandler: function(message) {
-      var type = JSON.parse(message.data).type;
+      var data = JSON.parse(message.data);
       
-      switch (type) {
+      switch (data.type) {
+        case "initialData":
+          this.initialDataHandler(data);
+          break;
         case "chat":
-          this.handleMessage(message);
+          this.messageHandler(data);
+          break;
+        case "nameReqStatus":
+          this.nameRequestHandler(data);
           break;
         case "usersList":
-          this.handleUsersList(message);
+          this.usersListHandler(data);
           break;
       }
     },

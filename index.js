@@ -23,29 +23,6 @@ var chats = [
 wss.on('connection', ws => {
   var handshakeOver = false;
 
-
-  // Is desired username taken?
-  function initialHandler(message) {
-    if (users.includes(message)) {
-      ws.send(JSON.stringify({
-        nameGranted: false
-      }));
-    }
-    else {
-      ws.send(JSON.stringify({
-        nameGranted: true,
-        chats: chats
-      }));
-      ws.userName = message;
-      users.push(message);
-      handshakeOver = true;
-
-      // Send out list of active users periodically
-      broadcastUserList();
-      console.log(`User connected: ${ws.userName}`);
-    }
-  }
-
   function broadcastUserList() {
     if (ws.readyState == 1) {
       ws.send(JSON.stringify({
@@ -57,6 +34,33 @@ wss.on('connection', ws => {
       setTimeout(broadcastUserList, 10000);
     }
   }
+
+  // Is desired username taken?
+  function initialHandler(message) {
+    var data = JSON.parse(message);
+
+    if (users.includes(data.name)) {
+      ws.send(JSON.stringify({
+        type: "nameReqStatus",
+        nameGranted: false
+      }));
+    }
+    else {
+      ws.send(JSON.stringify({
+        type: "nameReqStatus",
+        nameGranted: true,
+        chats: chats
+      }));
+      ws.userName = data.name;
+      users.push(data.name);
+      handshakeOver = true;
+
+      // Send out list of active users periodically
+      broadcastUserList();
+      console.log(`User connected: ${ws.userName}`);
+    }
+  }
+
 
   function normalHandler(message) {
     var chat = JSON.parse(message);
@@ -79,6 +83,7 @@ wss.on('connection', ws => {
   
   // Send initial data
   ws.send(JSON.stringify({
+    type: 'initialData',
     chats: chats
   }));
 });
